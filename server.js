@@ -598,7 +598,7 @@ apiRouter.get('/shipments/:trackingNumber/waybill', async (req, res) => {
 
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'EB logo.jpg');
+            const logoPath = path.join(__dirname, '..', 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
@@ -741,7 +741,7 @@ apiRouter.get('/delivery-notes/:id/pdf', async (req, res) => {
         // Logo top-left
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'EB logo.jpg');
+            const logoPath = path.join(__dirname, '..', 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
@@ -899,6 +899,4 @@ const startServer = async () => {
 };
 
 startServer();
-
-
 
