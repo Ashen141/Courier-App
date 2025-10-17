@@ -577,7 +577,9 @@ apiRouter.get('/shipments/:trackingNumber/waybill', async (req, res) => {
         let y = height - padding;
 
         const wrapText = (text, f, fontSize, maxWidth) => {
-            const words = text ? String(text).split(' ') : [];
+            // Sanitize the text to remove newline characters which can crash the PDF generation
+            const sanitizedText = text ? String(text).replace(/(\r\n|\n|\r)/gm, " ") : "";
+            const words = sanitizedText.split(' ');
             let lines = [];
             let currentLine = '';
             for (const word of words) {
@@ -596,7 +598,7 @@ apiRouter.get('/shipments/:trackingNumber/waybill', async (req, res) => {
 
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'logo', 'EB logo.jpg');
+            const logoPath = path.join(__dirname, 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
@@ -739,7 +741,7 @@ apiRouter.get('/delivery-notes/:id/pdf', async (req, res) => {
         // Logo top-left
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'logo', 'EB logo.jpg');
+            const logoPath = path.join(__dirname, 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
@@ -897,4 +899,6 @@ const startServer = async () => {
 };
 
 startServer();
+
+
 
