@@ -577,7 +577,9 @@ apiRouter.get('/shipments/:trackingNumber/waybill', async (req, res) => {
         let y = height - padding;
 
         const wrapText = (text, f, fontSize, maxWidth) => {
-            const words = text ? String(text).split(' ') : [];
+            // Sanitize the text to remove newline characters which can crash the PDF generation
+            const sanitizedText = text ? String(text).replace(/(\r\n|\n|\r)/gm, " ") : "";
+            const words = sanitizedText.split(' ');
             let lines = [];
             let currentLine = '';
             for (const word of words) {
@@ -596,13 +598,15 @@ apiRouter.get('/shipments/:trackingNumber/waybill', async (req, res) => {
 
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'logo', 'EB logo.jpg');
+            const logoPath = path.resolve(process.cwd(), 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
                 const logoDims = logoImage.scale(0.25);
                 currentPage.drawImage(logoImage, { x: padding, y: y - logoDims.height + 20, width: logoDims.width, height: logoDims.height });
                 logoBottomY = y - logoDims.height;
+            } else {
+                console.log(`Logo not found at path: ${logoPath}`);
             }
         } catch (e) { console.error("Could not embed logo from file:", e); }
 
@@ -739,13 +743,15 @@ apiRouter.get('/delivery-notes/:id/pdf', async (req, res) => {
         // Logo top-left
         let logoBottomY = y;
         try {
-            const logoPath = path.join(__dirname, 'logo', 'EB logo.jpg');
+            const logoPath = path.resolve(process.cwd(), 'EB logo.jpg');
             if (fs.existsSync(logoPath)) {
                 const imageBytes = fs.readFileSync(logoPath);
                 const logoImage = await pdfDoc.embedJpg(imageBytes);
                 const logoDims = logoImage.scale(0.25);
                 page.drawImage(logoImage, { x: padding, y: y - logoDims.height + 20, width: logoDims.width, height: logoDims.height });
                 logoBottomY = y - logoDims.height + 20;
+            } else {
+                 console.log(`Logo not found at path: ${logoPath}`);
             }
         } catch (e) { console.error("Could not embed logo from file:", e); }
 
